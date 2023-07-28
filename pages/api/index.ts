@@ -11,7 +11,6 @@ export const config = {
 };
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  console.log();
   switch (req.method) {
     case 'POST': {
       if (!req.body || req.body.link === '')

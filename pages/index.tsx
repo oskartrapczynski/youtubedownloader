@@ -1,14 +1,20 @@
 import axios from 'axios';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useRef, useState } from 'react';
 import { saveAs } from 'file-saver';
-
-import { TextField, Button, Typography } from '@mui/material';
-import Image from 'next/image';
+import {
+  TextField,
+  Button,
+  Typography,
+  Card,
+  CardContent,
+  Box,
+  CardMedia,
+  Alert,
+  LinearProgress,
+} from '@mui/material';
 
 const Homepage = () => {
-  const [link, setLink] = useState(
-    'https://www.youtube.com/watch?v=50DEtvLTE34'
-  );
+  const [link, setLink] = useState('');
   const [audio, setAudio] = useState({
     audio: '',
     fileName: '',
@@ -20,17 +26,7 @@ const Homepage = () => {
     thumb: '',
   });
 
-  // const fetchData = async () => {
-  //   // const data = await axios.get('/api/test');
-  //   const { data } = await axios.get('/api');
-  //   console.log(data);
-
-  //   setAudio(data);
-  // };
-
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
+  const audioRef = useRef<null | HTMLAudioElement>(null);
 
   const handleChangeLink = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e) return;
@@ -44,7 +40,6 @@ const Homepage = () => {
       {
         responseType: 'blob',
         onDownloadProgress: (progressEvent) => {
-          // console.log(`${progressEvent.loaded / 1000000}MB`);
           setDownloadInfo((prev) => ({
             ...prev,
             size: `${progressEvent.loaded / 1000000}MB`,
@@ -53,13 +48,14 @@ const Homepage = () => {
       }
     );
 
-    // console.log(data);
-
     const disposition = data.headers['content-disposition'];
     const fileName = disposition
       .slice(0, disposition.length - 4)
       .split('filename=')[1]
-      .split(';')[0];
+      .split(';')[0]
+      .split(' thumb=')[0];
+
+    console.log(disposition);
 
     const thumbnailUrl = disposition
       .slice(0, disposition.length - 4)
@@ -67,8 +63,6 @@ const Homepage = () => {
       .split(';')[0];
 
     setDownloadInfo({ size: '', end: true, thumb: thumbnailUrl });
-
-    // console.log(thumbnailUrl);
 
     const blobUrl = URL.createObjectURL(data.data);
     setAudio({ audio: blobUrl, fileName });
@@ -90,28 +84,69 @@ const Homepage = () => {
       <Button variant="contained" onClick={handleDownload}>
         Konwertuj
       </Button>
-      {audio.audio.length > 0 && <audio controls src={audio.audio} />}
-      {audio.audio.length > 0 && (
-        <Button color="success" variant="contained" onClick={handleSaveAs}>
-          Pobierz
-        </Button>
-      )}
+
       {downloadInfo.size.length > 0 && (
-        <Typography variant="h6">
-          Pobrano: {parseFloat(downloadInfo.size).toFixed(2)} MB
-        </Typography>
+        <>
+          <Typography variant="h6">
+            Pobrano: {parseFloat(downloadInfo.size).toFixed(2)} MB
+          </Typography>
+          <LinearProgress />
+        </>
       )}
+
       {downloadInfo.end && (
-        <Typography color="success.main" variant="h6">
-          Pobieranie ukończone
-        </Typography>
+        <Alert severity="success">Pobieranie ukończone</Alert>
       )}
-      {downloadInfo.thumb.length > 0 && (
-        <img
-          style={{ width: '30%' }}
-          src={downloadInfo.thumb}
-          alt={`${audio.fileName} thumb`}
-        />
+
+      {downloadInfo.end && (
+        <>
+          <Card sx={{ display: 'flex' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <CardContent sx={{ flex: '1 0 auto' }}>
+                <Typography component="div" variant="h5">
+                  {audio.fileName.includes('-')
+                    ? audio.fileName
+                        .slice(0, audio.fileName.length - 4)
+                        .split('-')[1]
+                    : audio.fileName}
+                </Typography>
+                <Typography
+                  variant="subtitle1"
+                  color="text.secondary"
+                  component="div"
+                >
+                  {audio.fileName.includes('-')
+                    ? audio.fileName.split('-')[0]
+                    : ''}
+                </Typography>
+              </CardContent>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  pl: 1,
+                  pb: 1,
+                }}
+              >
+                {audio.audio.length > 0 && <audio controls src={audio.audio} />}
+              </Box>
+            </Box>
+            {downloadInfo.thumb.length > 0 && (
+              <CardMedia
+                component="img"
+                sx={{ width: 151 }}
+                image={downloadInfo.thumb}
+                alt={`${audio.fileName} cover`}
+              />
+            )}
+          </Card>
+          {audio.audio.length > 0 && (
+            <Button color="success" variant="contained" onClick={handleSaveAs}>
+              Pobierz
+            </Button>
+          )}
+        </>
       )}
     </>
   );
