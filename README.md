@@ -1,5 +1,4 @@
 # 🎵 NEXT YouTube Downloader 🎥
-<<<<<<< HEAD
 
 ## Requirements
 
@@ -8,7 +7,10 @@
 ## 🧾 Instalation
 
 - use `npm i` command (if you don't have installed yet)
-- open `RUN.bat` file and enjoy YouTube Downloader
+- FOR WINDOWS:
+    - open `RUN_Windows.bat` file and enjoy YouTube Downloader
+- FOR LINUX/MACOS:
+    - open bash/terminal and run `RUN_LinuxMac.sh`
 
 ## ℹ Description
 
@@ -49,4 +51,3 @@ Currently you can paste YouTube link and download .MP3 file with 320 bitrate
 * 🔜 .WAV
 * 🔜 Format picker
 * 🔜 Video downloader
->>>>>>> bbab3317d6232fe5bf8a7f614682d61f562f75bd
