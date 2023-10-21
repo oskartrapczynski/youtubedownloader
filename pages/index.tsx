@@ -65,7 +65,7 @@ const Homepage = () => {
     setDownloadInfo({ size: '', end: true, thumb: thumbnailUrl });
 
     const blobUrl = URL.createObjectURL(data.data);
-    setAudio({ audio: blobUrl, fileName });
+    setAudio({ audio: blobUrl, fileName: decodeURIComponent(fileName) });
   };
 
   const handleSaveAs = () => {

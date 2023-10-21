@@ -40,7 +40,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       res.writeHead(HttpStatusCode.Ok, {
         'Content-Type': 'audio/mpeg',
-        'Content-Disposition': `attachment; filename=${fileName} thumb=${thumbnailUrl}`,
+        'Content-Disposition': `attachment; filename=${encodeURIComponent(
+          fileName
+        )} thumb=${thumbnailUrl}`,
       });
 
       // res.writeHead(HttpStatusCode.Ok, {
