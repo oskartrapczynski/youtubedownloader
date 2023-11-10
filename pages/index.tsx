@@ -11,10 +11,14 @@ import {
   CardMedia,
   Alert,
   LinearProgress,
+  MenuItem,
 } from '@mui/material';
+
+import { AUDIO_TYPE } from './constants';
 
 const Homepage = () => {
   const [link, setLink] = useState('');
+  const [audioType, setAudioType] = useState(AUDIO_TYPE.MP3);
   const [audio, setAudio] = useState({
     audio: '',
     fileName: '',
@@ -33,10 +37,25 @@ const Homepage = () => {
     setLink(e.target.value);
   };
 
+  const handleSelectChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    if (!e) return;
+    const { value } = e.target;
+    switch (value) {
+      case AUDIO_TYPE.MP3:
+        return setAudioType(AUDIO_TYPE.MP3);
+      case AUDIO_TYPE.WAV:
+        return setAudioType(AUDIO_TYPE.WAV);
+      default:
+        return;
+    }
+  };
+
   const handleDownload = async () => {
     const data = await axios.post(
       '/api',
-      { link },
+      { link, audioType },
       {
         responseType: 'blob',
         onDownloadProgress: (progressEvent) => {
@@ -74,16 +93,28 @@ const Homepage = () => {
 
   return (
     <>
-      <TextField
-        label="Link"
-        variant="standard"
-        type="text"
-        value={link}
-        onChange={handleChangeLink}
-      />
-      <Button variant="contained" onClick={handleDownload}>
-        Konwertuj
-      </Button>
+      <Box display="flex" gap={2}>
+        <TextField
+          label="Link"
+          variant="standard"
+          type="text"
+          value={link}
+          onChange={handleChangeLink}
+        />
+        <TextField
+          variant="standard"
+          select
+          label="Typ pliku"
+          value={audioType}
+          onChange={handleSelectChange}
+        >
+          <MenuItem value={AUDIO_TYPE.MP3}>{AUDIO_TYPE.MP3}</MenuItem>
+          <MenuItem value={AUDIO_TYPE.WAV}>{AUDIO_TYPE.WAV}</MenuItem>
+        </TextField>
+        <Button variant="contained" onClick={handleDownload}>
+          Konwertuj
+        </Button>
+      </Box>
 
       {downloadInfo.size.length > 0 && (
         <>
